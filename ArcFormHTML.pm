@@ -101,19 +101,22 @@ eof
     # _____________________________________________________
     $toReturn.= <<eof;
       <div class="card border-primary mb-3">
-        <div class="card-header"><h3>Event Name:</h3></div>
+        <div class="card-header"><h3>Authentication Code:</h3></div>
         <div class="card-body">
           <form method="POST">
             <div class="form-group">
-              <input type="text" class="form-control" name="event_name" placeholder="eg, Ball">
+              <input type="text" class="form-control" name="auth_code" placeholder="tastyNightmares">
             </div>
-          </form>
-          <form method="POST">
             <div class="form-group">
-              <div class="card-header">Common Events</div>
-              <br>
               <button type="submit" name="event_name" value="Coffee Night" class="btn btn-primary">Coffee Night</button>
               <button type="submit" name="event_name" value="Culture Night" class="btn btn-primary">Culture Night</button>
+            </div>
+            <div class="form-group">
+              <div class="card-header">Custom Event:</div>
+            </div>
+            <div class="input-group">
+              <input type="text" class="form-control" name="event_name" placeholder="eg, Ball">
+              <button type="submit" class="btn btn-info">Create</button>
             </div>
           </form>
         </div>
@@ -149,9 +152,9 @@ eof
     return $toReturn;
 }
 
-sub not_in_arc_html($$){
+sub not_in_arc_html($$$){
 
-    my ($event_name, $zID) = @_;
+    my ($event_name, $zID, $auth) = @_;
 
     # Not found in arc
     # _____________________________________________________
@@ -159,13 +162,14 @@ sub not_in_arc_html($$){
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card border-primary mb-3">
-        <div class="card-header"><h3 align="center">Are you a 2018 arc member?</h3></div>
+        <div class="card-header"><h3 align="center">Are you a 2019 arc member?</h3></div>
         <div class="card-body">
             <div class="form-group">
               <div class="row justify-content-around">
                 <div class="col">
                   <form method="POST">
                     <input type="hidden" name="event_name" value="$event_name">
+                    <input type="hidden" name="auth_code" value="$auth">
                     <input type="hidden" name="become_arc_member" value="Yes">
                     <input type="hidden" name="zID_entered" value="$zID">
                     <button type="submit" class="btn btn-success btn-block">Yes</button>
@@ -187,9 +191,9 @@ sub not_in_arc_html($$){
 eof
 }
 
-sub sign_in_form_html($){
+sub sign_in_form_html($$){
 
-    my ($event_name) = @_;
+    my ($event_name, $auth) = @_;
     my $toReturn = "";
 
     # a gap, then an offset to center and 6 for forms
@@ -209,6 +213,7 @@ eof
         <div class="card-body">
           <form method="POST">
             <div class="form-group">
+              <input type="hidden" name="auth_code" value="$auth">
               <input type="hidden" name="event_name" value="$event_name">
               <input type="hidden" name="sign_in_zID" value="zID">
               <input type="text" autofocus="autofocus" class="form-control" name="zID_entered" placeholder="z1234567">
@@ -230,6 +235,7 @@ eof
           <form method="POST">
             <div class="form-group">
               <input type="hidden" name="event_name" value="$event_name">
+              <input type="hidden" name="auth_code" value="$auth">
               <input type="hidden" name="sign_in_manual" value="">
               <input type="text" class="form-control" name="first_name" placeholder="First Name">
             </div>

@@ -17,6 +17,7 @@ use File::Copy qw/move/;
 
 # contains all of my html code blocks
 use ArcFormHTML;
+use AuthCode;
 
 $debug = 1;  #prints supplied parameters and values in trailer
 
@@ -42,21 +43,33 @@ sub main() {
     # if event name existing, then have a valid event
     if (defined(param('event_name'))) {
 
-        # kept as global values I guess
-        $event_name = param('event_name');
-        $event_name =~ s/\s/_/g;
-        $attendance_file_name = "events/${event_name}${mday}-$mon.csv";
+        # check they have given a valid authentication code to begin an event
+        # (so only HC can make events, instead of people making coffee night
+        # themselves and signing in remotely) 
+        if (defined(param('auth_code')) and param('auth_code') eq $AUTH_CODE) {
 
-        if (defined(param('sign_in_zID'))) {
-            sign_in_attempt(param('zID_entered'));
-        } elsif (defined(param('sign_in_manual'))) {
-            manual_sign_in();
-        } elsif (defined(param('become_arc_member'))) {
-            make_arc_member(param('zID_entered'));
+            # kept as global values I guess
+            $event_name = param('event_name');
+            $event_name =~ s/\s/_/g;
+            $auth_code = param('auth_code');
+            $attendance_file_name = "events/${event_name}${mday}-$mon.csv";
+
+            if (defined(param('sign_in_zID'))) {
+                sign_in_attempt(param('zID_entered'));
+            } elsif (defined(param('sign_in_manual'))) {
+                manual_sign_in();
+            } elsif (defined(param('become_arc_member'))) {
+                make_arc_member(param('zID_entered'));
+            }
+
+            # After all that, print the rest of the page
+            submission_page();
+
+        # authentication code not correct
+        } else {
+            print notice_html("Error: authentication code incorrect", "warning");
+            print start_page_html();
         }
-
-        # After all that, print the rest of the page
-        submission_page();
 
     # otherwise, we're at the start page?
     } else {
@@ -148,7 +161,7 @@ sub sign_in_attempt($) {
             $arcMember = "Yes" if ($line =~ /TRUE/);
             mark_as_attending($name, $zID, $arcMember);
 
-            print not_in_arc_html($event_name, $zID) if ($arcMember eq "No");
+            print not_in_arc_html($event_name, $zID, $auth_code) if ($arcMember eq "No");
 
             last;
         }
@@ -295,7 +308,7 @@ sub submission_page{
         close ATTEND;
     }
 
-    print sign_in_form_html($event_name);
+    print sign_in_form_html($event_name, $auth_code);
 }
 
 
