@@ -1,5 +1,5 @@
 zIDFile.csv
-archive
-events
-oldZIDFiles
-emailForms.sh
+archive/
+events/
+oldZIDFiles/
+AuthCode.pm
